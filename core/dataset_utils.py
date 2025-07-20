@@ -5,23 +5,47 @@ import numpy as np
 
 
 class RIRHDF5Dataset(Dataset):
-    def __init__(self, rir_path: str = 'data/rir_dataset.h5', metrics_path: str = 'data/rir_metrics.h5', target_keys=None, normalize_rir=True, normalize_targets=True):
+    def __init__(
+        self,
+        rir_path: str = 'data/rir_dataset.h5',
+        metrics_path: str = 'data/rir_metrics.h5',
+        target_keys=None,
+        normalize_targets=False,
+        target_mean=None,
+        target_std=None,
+        subset_indices=None,
+        normalize_rir=False  # ← added this missing argument
+    ):
         self.rir_h5 = h5py.File(rir_path, 'r')
         self.metrics_h5 = h5py.File(metrics_path, 'r')
         self.rirs = self.rir_h5['rirs']
         self.target_keys = target_keys or ['rt60', 'edt', 'c50', 'd50']
-        self.normalize_rir = normalize_rir
         self.normalize_targets = normalize_targets
+        self.normalize_rir = normalize_rir
 
         # Load all targets at once for normalization
         self.targets_raw = np.stack([self.metrics_h5[k][:] for k in self.target_keys], axis=1)
 
-        if self.normalize_targets:
-            self.target_mean = self.targets_raw.mean(axis=0)
-            self.target_std = self.targets_raw.std(axis=0)
-            self.targets = (self.targets_raw - self.target_mean) / (self.target_std + 1e-12)
+        # Handle subset if provided
+        if subset_indices is not None:
+            subset_indices = np.array(subset_indices)
+            self.rirs = self.rirs[subset_indices]
+            self.targets = self.targets_raw[subset_indices]
         else:
             self.targets = self.targets_raw
+
+        # Normalize targets if requested
+        if normalize_targets:
+            assert target_mean is not None and target_std is not None, "Must provide mean and std for normalization"
+            self.target_mean = target_mean
+            self.target_std = target_std
+            self.targets = (self.targets - target_mean) / (target_std + 1e-12)
+        else:
+            self.target_mean = None
+            self.target_std = None
+
+        # Optional: ensure matching shapes
+        assert self.rirs.shape[0] == self.targets.shape[0], "Mismatch between RIR and target count"
 
     def __len__(self):
         return len(self.rirs)
@@ -34,12 +58,14 @@ class RIRHDF5Dataset(Dataset):
 
         rir_tensor = torch.tensor(rir, dtype=torch.float32)
         target_tensor = torch.tensor(self.targets[idx], dtype=torch.float32)
-
         return rir_tensor, target_tensor
 
     def close(self):
         self.rir_h5.close()
         self.metrics_h5.close()
+
+    def __del__(self):
+        self.close()
 
 
 def denormalize(preds: torch.Tensor, mean: np.ndarray, std: np.ndarray) -> torch.Tensor:
