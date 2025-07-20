@@ -28,7 +28,7 @@ class RIRHDF5Dataset(Dataset):
 
         # Handle subset if provided
         if subset_indices is not None:
-            subset_indices = np.array(subset_indices)
+            subset_indices = np.sort(np.array(subset_indices))
             self.rirs = self.rirs[subset_indices]
             self.targets = self.targets_raw[subset_indices]
         else:
