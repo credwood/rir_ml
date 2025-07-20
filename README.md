@@ -15,7 +15,7 @@ This model processes raw Room Impulse Responses (RIRs) through a series of 1D co
 
 #### Tensor Dimensions Through the 1D CNN
 
-Assuming an input RIR of shape `[B, T]` (e.g., `T = 8192`), the model processes it through the following transformations:
+Assuming an input RIR of shape `[B, 1, T]` (e.g., `T = 8192`), the model processes it through the following transformations:
 
 | **Layer**               | **Input Shape**      | **Output Shape**     | **Description**                                                   |
 |-------------------------|----------------------|-----------------------|-------------------------------------------------------------------|

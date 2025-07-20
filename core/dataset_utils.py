@@ -24,6 +24,12 @@ class RIRHDF5Dataset(Dataset):
         self.normalize_rir = normalize_rir
 
         # Load all targets at once for normalization
+        raw_targets = []
+        for key in self.target_keys:
+            values = self.metrics_h5[key][:]
+            if key == 'c50':
+                values = 10 ** (values / 10)  # convert dB to linear
+            raw_targets.append(values)
         self.targets_raw = np.stack([self.metrics_h5[k][:] for k in self.target_keys], axis=1)
 
         # Handle subset if provided
@@ -72,3 +78,13 @@ def denormalize(preds: torch.Tensor, mean: np.ndarray, std: np.ndarray) -> torch
     mean_tensor = torch.from_numpy(mean).to(preds.device).type_as(preds)
     std_tensor = torch.from_numpy(std).to(preds.device).type_as(preds)
     return preds * std_tensor + mean_tensor
+
+def convert_to_db(values: torch.Tensor, indices: list) -> torch.Tensor:
+    """
+    Converts specified columns from linear to dB in-place.
+    `indices` is a list of indices for C50, D50 (e.g., [2, 3])
+    """
+    db_values = values.clone()
+    db_values[:, indices] = 10 * torch.log10(db_values[:, indices] + 1e-12)
+    return db_values
+

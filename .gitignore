@@ -7,3 +7,4 @@ data/rir_metrics.h5
 
 # Optional: Ignore any cached output or model files
 *.pt
+.DS_Store
