@@ -1,0 +1,10 @@
+pyroomacoustics
+scipy
+numpy
+seaborn
+matplotlib
+torch
+librosa
+soundfile
+pandas
+tqdm
