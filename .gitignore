@@ -1,0 +1,9 @@
+# Ignore HDF5 files
+*.h5
+
+# Or specific files
+data/rir_dataset.h5
+data/rir_metrics.h5
+
+# Optional: Ignore any cached output or model files
+*.pt
