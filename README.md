@@ -82,8 +82,7 @@ Assuming an input RIR of shape `[B, T]` (e.g., `T = 8192`), the model processes 
 
 | **Layer**               | **Input Shape**      | **Output Shape**     | **Description**                                                   |
 |-------------------------|----------------------|-----------------------|-------------------------------------------------------------------|
-| **Raw Input**           | `[B, T]`             | —                     | Raw 1D RIR signal                                                 |
-| **Unsqueeze**           | `[B, T]`             | `[B, 1, T]`           | Adds channel dimension for Conv1d                                |
+| **Raw Input**           | `[B, 1, T]`             | —                     | Raw 1D RIR signal                                                 |                               |
 | **Conv1d #1**           | `[B, 1, 8192]`       | `[B, 32, 8192]`       | Local features, no downsampling                                  |
 | **Conv1d #2**           | `[B, 32, 8192]`      | `[B, 64, 4096]`       | Mid-range features, downsample by 2                              |
 | **Conv1d #3**           | `[B, 64, 4096]`      | `[B, 128, 2048]`      | Long-range decay modeling, downsample by 2 again                 |
