@@ -23,14 +23,14 @@ class RIRHDF5Dataset(Dataset):
         self.normalize_targets = normalize_targets
         self.normalize_rir = normalize_rir
 
-        # Load all targets at once for normalization
-        raw_targets = []
-        for key in self.target_keys:
-            values = self.metrics_h5[key][:]
-            if key == 'c50':
-                values = 10 ** (values / 10)  # convert dB to linear
-            raw_targets.append(values)
-        self.targets_raw = np.stack([self.metrics_h5[k][:] for k in self.target_keys], axis=1)
+        # Load all raw targets
+        self.targets_raw = np.stack(
+            [self.metrics_h5[k][:] for k in self.target_keys],
+            axis=1
+        )
+
+        # Convert C50 (index 2) to linear scale from dB
+        self.targets_raw[:, 2] = 10 ** (self.targets_raw[:, 2]/10)
 
         # Handle subset if provided
         if subset_indices is not None:
