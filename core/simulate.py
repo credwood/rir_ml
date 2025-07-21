@@ -12,8 +12,8 @@ ROOM_SIZES = [
     (15, 20, 5)   # Very Large
 ]
 
-ABSORPTION_LEVELS = [0.1, 0.3, 0.5, 0.7, 0.9]
-REFLECTION_ORDERS = [0, 1, 2, 3, 4, 5]
+ABSORPTION_LEVELS = [0.1, 0.3, 0.5, 0.7]
+REFLECTION_ORDERS = [2, 3, 4, 5]
 
 def simulate_rir() -> Tuple[np.ndarray, dict]:
     """
