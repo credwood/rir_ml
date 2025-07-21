@@ -85,6 +85,6 @@ def convert_to_db(values: torch.Tensor, indices: list) -> torch.Tensor:
     `indices` is a list of indices for C50, D50 (e.g., [2, 3])
     """
     db_values = values.clone()
-    db_values[:, indices] = 10 * torch.log10(db_values[:, indices] + 1e-12)
+    db_values[:, indices] = 10 * torch.log10(db_values[:, indices]/10 + 1e-12)
     return db_values
 
