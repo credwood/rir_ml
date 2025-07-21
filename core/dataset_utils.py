@@ -14,7 +14,7 @@ class RIRHDF5Dataset(Dataset):
         target_mean=None,
         target_std=None,
         subset_indices=None,
-        normalize_rir=False  # ← added this missing argument
+        normalize_rir=False  
     ):
         self.rir_h5 = h5py.File(rir_path, 'r')
         self.metrics_h5 = h5py.File(metrics_path, 'r')
@@ -50,7 +50,7 @@ class RIRHDF5Dataset(Dataset):
             self.target_mean = None
             self.target_std = None
 
-        # Optional: ensure matching shapes
+        # Ensure matching shapes
         assert self.rirs.shape[0] == self.targets.shape[0], "Mismatch between RIR and target count"
 
     def __len__(self):
@@ -80,10 +80,6 @@ def denormalize(preds: torch.Tensor, mean: np.ndarray, std: np.ndarray) -> torch
     return preds * std_tensor + mean_tensor
 
 def convert_to_db(values: torch.Tensor, indices: list) -> torch.Tensor:
-    """
-    Converts specified columns from linear to dB in-place.
-    `indices` is a list of indices for C50, D50 (e.g., [2, 3])
-    """
     db_values = values.clone()
     db_values[:, indices] = 10 * torch.log10(db_values[:, indices]/10 + 1e-12)
     return db_values
